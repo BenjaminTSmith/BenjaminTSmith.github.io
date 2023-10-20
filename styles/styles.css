@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Young+Serif&display=swap');
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-family: 'Young Serif', serif;
+    color: rgb(233, 230, 252);
+    background-color: rgb(233, 230, 252);
+    padding-top: 58px;
+}
+
+nav {
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgb(51, 48, 70);
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.881);
+}
+
+ul {
+    list-style: none;
+}
+
+nav ul {
+    display: flex;
+    gap: 1.9rem
+}
+
+nav a {
+    transition: all 0.15s;
+    text-decoration: none;
+    cursor: pointer;
+    color: rgb(233, 230, 252);
+}
+
+nav a:hover {
+    text-decoration: underline;
+    color: rgb(215, 118, 0);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.881);
+}
+
+.hero-section {
+    display: flex;
+    margin-bottom: 10%;
+}
+
+.about-section {
+    background-color: rgb(51, 48, 70);
+    width: 400px;
+    margin-top: 120px;
+    margin-left: 30%;
+    margin-right: 2%;
+    flex: 1;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.881);
+}
+
+.skills-header {
+    color: rgb(51, 48, 70);
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 100px;
+    justify-content: center;
+    text-align: center;
+    margin: auto;
+    margin-bottom: 20px;
+}
+
+.skills-section {
+    display: flex;
+    column-gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: auto;
+    max-width: 1150px;
+    flex-direction: row;
+    margin-bottom: 10%;
+}
+
+.skill {
+    margin: 5px;
+    grid-template-columns: 100%;
+    justify-content: center;
+    width: 145px;
+    object-fit: contain;
+    padding: 25px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+}
