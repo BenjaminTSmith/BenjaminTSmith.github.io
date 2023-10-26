@@ -1,6 +1,6 @@
 let grid = [];
-let cols = 30;
-let rows = 30;
+let cols = 50;
+let rows = 50;
 let play = false;
 
 function setup() {
