@@ -1,0 +1,11 @@
+Model Information:
+* title:	Manga Tuner(HotWheels)
+* source:	https://sketchfab.com/3d-models/manga-tunerhotwheels-c1070aaa921340afaad1ba7f1939992c
+* author:	AHarmlessPotato (https://sketchfab.com/AHarmlessPotato)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Manga Tuner(HotWheels)" (https://sketchfab.com/3d-models/manga-tunerhotwheels-c1070aaa921340afaad1ba7f1939992c) by AHarmlessPotato (https://sketchfab.com/AHarmlessPotato) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
