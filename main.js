@@ -3,39 +3,35 @@ import './style.css';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, document.body.scrollWidth / document.body.scrollHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('#bg'), alpha: true,
-});
+function easeInOutQuart(x) {
+    return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
+}
 
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(document.body.scrollWidth, document.body.scrollHeight);
+document.body.appendChild(renderer.domElement);
 camera.position.setZ(30);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
 directionalLight.position.set(5, 5, 5);
 scene.add(directionalLight);
 
-let car = null;
-let x = 0;
-let y = 0;
-
 const loader = new GLTFLoader();
+let gameboy = null;
 loader.load(
-    'car/scene.gltf', // Replace with the path to your GLTF file
+    'gameboy_classic/scene.gltf', // Replace with the path to your GLTF file
     (gltf) => {
         console.log('here');
-        car = gltf.scene;
-        car.scale.set(1.2, 1.2, 1.2); // Scale the model to make it bigger
-        car.position.set(0, 12, 0); // Center the model
-        car.rotation.x = Math.PI / 2;
-        scene.add(car);
-        car.getWorldPosition(worldPosition);
-        worldPosition.project(camera);
-        x = (worldPosition.x + 1) * 0.5 * document.body.scrollWidth;
-        y = (-worldPosition.y + 1) * 0.5 * document.body.scrollHeight;
-        scrollTo(0, y - screen.height / 2 + 50);
+        gameboy = gltf.scene;
+        gameboy.scale.set(4, 4, 4); // Scale the model to make it bigger
+        gameboy.position.set(3, -8, 0); // Center the model
+        gameboy.rotation.set(0.6, -0.20, 0.4);
+        scene.add(gameboy);
     },
     (xhr) => {
         console.log(`Model ${(xhr.loaded / xhr.total) * 100}% loaded`);
@@ -45,112 +41,89 @@ loader.load(
     }
 );
 
-let forward = false;
-let left = false;
-let back = false;
-let right = false;
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'w') {
-        forward = true;
-    } else if (event.key === 'a') {
-        left = true;
-    } else if (event.key === 's') {
-        back = true;
-    } else if (event.key === 'd') {
-        right = true;
+let cartridge = null;
+loader.load(
+    'gameboy_cartridge/scene.gltf', // Replace with the path to your GLTF file
+    (gltf) => {
+        console.log('here');
+        cartridge = gltf.scene;
+        cartridge.scale.set(4, 4, 4); // Scale the model to make it bigger
+        cartridge.position.set(-8, -8, 0); // Center the model
+        cartridge.rotation.set(Math.PI / 2, -Math.PI / 2, 0);
+        scene.add(cartridge);
+    },
+    (xhr) => {
+        console.log(`Model ${(xhr.loaded / xhr.total) * 100}% loaded`);
+    },
+    (error) => {
+        console.error('An error occurred while loading the GLTF model:', error);
     }
+);
+
+let x = 0;
+let y = 0;
+document.addEventListener('mousemove', function(event) {
+    x = event.clientX;
+    y = event.clientY;
 });
 
-document.addEventListener('keyup', (event) => {
-    if (event.key === 'w') {
-        forward = false;
-    } else if (event.key === 'a') {
-        left = false;
-    } else if (event.key === 's') {
-        back = false;
-    } else if (event.key === 'd') {
-        right = false;
-    }
+const clock = new THREE.Clock(true);
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let closestObject = null;
+
+window.addEventListener('mousemove', (event) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 });
 
-const links = document.getElementsByClassName("link");
-document.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        for (let i = 0; i < links.length; i++) {
-            let rect = links[i].getBoundingClientRect();
-            const top = rect.top + document.documentElement.scrollTop; 
-            const bottom = rect.bottom + document.documentElement.scrollTop; 
-            const left = rect.left;
-            const right = rect.right;
+function getClosestIntersection(camera, scene) {
+    raycaster.setFromCamera(mouse, camera);
 
-            console.log(y, top, bottom, x, left, right);
+    // Perform intersection test
+    const intersects = raycaster.intersectObjects(scene.children, true);
 
-            if (y > top && y < bottom && x > left && x < right) {
-                const href = links[i].getAttribute("href");
-                console.log("here");
-                if (href) {
-                    window.open(href, "_self");
-                }
-            } else {
-                console.log("not in link");
-            }
-        }
-    } else if (event.key === 'r') {
-        car.position.x = 0;
-        car.position.y = 12;
-        car.position.z = 0;
-        car.rotation.x = Math.PI / 2;
-        car.rotation.y = 0;
-        car.rotation.z = 0;
-
-        car.getWorldPosition(worldPosition);
-        worldPosition.project(camera);
-        x = (worldPosition.x + 1) * 0.5 * document.body.scrollWidth;
-        y = (-worldPosition.y + 1) * 0.5 * document.body.scrollHeight;
-        scrollTo(0, y - screen.height / 2 + 50);
+    if (intersects.length > 0) {
+        closestObject = intersects[0].object; // First item is always the closest
+    } else {
+        closestObject = null;
     }
-});
+}
 
+function isChildOf(child, parent) {
+    while (child) {
+        if (child === parent) return true;
+        child = child.parent;
+    }
+    return false;
+}
+
+let gameboyTimer = 0;
 function animate() {
     requestAnimationFrame(animate);
+    getClosestIntersection(camera, scene);
     renderer.clear();
 
-    let worldPosition = new THREE.Vector3();
-    car.getWorldPosition(worldPosition);
-    worldPosition.project(camera);
-    x = (worldPosition.x + 1) * 0.5 * document.body.scrollWidth;
-    y = (-worldPosition.y + 1) * 0.5 * document.body.scrollHeight;
+    const dt = clock.getDelta();
 
-    if (forward) {
-        scrollTo(0, y - screen.height / 2 + 50);
-        car.position.x += 0.3 * Math.sin(car.rotation.y);
-        car.position.y -= 0.3 * Math.cos(car.rotation.y);
-    }
-    if (back) {
-        scrollTo(0, y - screen.height / 2 + 50);
-        car.position.x -= 0.3 * Math.sin(car.rotation.y);
-        car.position.y += 0.3 * Math.cos(car.rotation.y);
-    }
-    if (left && forward) {
-        scrollTo(0, y - screen.height / 2 + 50);
-        car.rotation.y += 0.09;
+    console.log(gameboy)
+    console.log(closestObject)
+    if (isChildOf(closestObject, gameboy)) {
+        gameboyTimer += dt;
+        if (gameboyTimer > 1) gameboyTimer = 1;
+        const t = easeInOutQuart(gameboyTimer);
+        const z = (1 - t) * 0 + t * 4;
 
-    }
-    if (right && forward) {
-        scrollTo(0, y - screen.height / 2 + 50);
-        car.rotation.y -= 0.09;
+        gameboy.position.z = z;
+    } else {
+        gameboyTimer -= dt;
+        if (gameboyTimer < 0) gameboyTimer = 0;
+        const t = easeInOutQuart(gameboyTimer);
+        const z = (1 - t) * 0 + t * 4;
 
+        gameboy.position.z = z;
     }
-    if (left && back) {
-        scrollTo(0, y - screen.height / 2 + 50);
-        car.rotation.y -= 0.09;
-    }
-    if (right && back) {
-        scrollTo(0, y - screen.height / 2 + 50);
-        car.rotation.y += 0.09;
-    }
-
 
     renderer.render(scene, camera);
 }
