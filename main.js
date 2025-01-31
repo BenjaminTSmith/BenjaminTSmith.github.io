@@ -1,7 +1,7 @@
 import './style.css';
 
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from './libs/three/three.module.js';
+import { GLTFLoader } from './libs/three/examples/jsm/loaders/GLTFLoader.js';
 
 function easeInOutQuart(x) {
     return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
